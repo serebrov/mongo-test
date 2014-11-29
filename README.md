@@ -52,8 +52,7 @@ Why it can't just go over object fields to find these changes?
 
 Another (similar in terms of usability) issue is with [instance methods](http://mongoosejs.com/docs/guide.html): "Overwriting a default mongoose document method may lead to unpredictible results".
 
-So while Mongoose aim seems to provide a more safe and reliable way to work with
-MonogoDb it actually introduces several ways to break your code without having
-any indication of the error.
+So while Mongoose's aim seems to provide a more safe and reliable way to work with
+MonogoDb it actually introduces several ways to silently break the code.
 In my opinion such things should not be just described in documentation and treated
 as normal situation. The library should handle them and raise explicit errors.

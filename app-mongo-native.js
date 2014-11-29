@@ -1,7 +1,6 @@
 var as = require('./app-skeleton');
-var hljs = require('highlight.js');
 
-var mongoose = require('mongoose');
+var mongo = require('mongodb')
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
@@ -96,7 +95,7 @@ as.app.get('/', function (req, res) {
       res.render('data', {
         title: 'Creates a new model on each call',
         code: as.getCode(arguments),
-        data: hljs.highlight('json', out).value});
+        data: as.hljs.highlight('json', out).value});
     });
   });
 });
@@ -107,7 +106,7 @@ as.app.get('/refs', function (req, res) {
     res.render('data', {
       title: 'Blog with author populated from User',
       code: as.getCode(arguments),
-      data: hljs.highlight('json', out).value});
+      data: as.hljs.highlight('json', out).value});
   });
 });
 
@@ -125,7 +124,7 @@ as.app.get('/wrongSchema', function (req, res) {
       res.render('data', {
         title: 'titleFF does not exist and should raise an error',
         code: as.getCode(wrongSchemaArguments),
-        data: hljs.highlight('json', out).value
+        data: as.hljs.highlight('json', out).value
       });
     });
   });
@@ -142,7 +141,7 @@ as.app.get('/any', function (req, res) {
       res.render('data', {
         title: 'Any model, "any" field can be anything',
         code: as.getCode(args),
-        data: hljs.highlight('json', out).value
+        data: as.hljs.highlight('json', out).value
       });
     });
   });
@@ -167,3 +166,4 @@ as.app.use(function(err, req, res, next) {
 });
 
 as.run();
+
