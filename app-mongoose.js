@@ -40,6 +40,32 @@ var getCode = function(args) {
   return hljs.highlight('javascript', args.callee.toString()).value;
 }
 
+var clearData = function(next) {
+  Blog.remove(function(err, data) {
+    if (err) throw err;
+    Any.remove(function(err, data) {
+      if (err) throw err;
+      next();
+    });
+  });
+
+};
+
+//Connect to mongo
+app.use(function(req, res, next) {
+  if (mongoose.connection.readyState > 0) {
+    return next();
+  }
+  mongoose.connect('mongodb://localhost/mongotest');
+  mongoose.connection.on('error', function(err) {
+    next(err);
+  });
+  mongoose.connection.on('open', function() {
+    next();
+  });
+});
+
+//Create test data
 app.use(function(req, res, next) {
   if (mongoose.connection.readyState > 0) {
     return next();
@@ -57,14 +83,15 @@ app.get('/', function (req, res) {
   var blog = new Blog;
   blog.title = 'test';
   blog.body = 'test';
-  blog.save();
-
-  Blog.find(function(err, data) {
-    var out = dataToString(data);
-    res.render('data', {
-      title: 'Creates a new model on each call',
-      code: getCode(arguments),
-      data: hljs.highlight('json', out).value});
+  blog.save(function(err, d) {
+    if (err) throw err;
+    Blog.find(function(err, data) {
+      var out = dataToString(data);
+      res.render('data', {
+        title: 'Creates a new model on each call',
+        code: getCode(arguments),
+        data: hljs.highlight('json', out).value});
+    });
   });
 });
 
@@ -75,14 +102,15 @@ app.get('/wrongSchema', function (req, res) {
   blog.titleZ = 'test'; // will not raise an error, mongoose doesn't see such changes
   blog.bodyZ = 'test';
   blog.set('titleFF', 'test'); // should raise an error
-  blog.save();
-
-  Blog.find(function(err, data) {
-    var out = dataToString(data);
-    res.render('data', {
-      title: 'titleFF does not exist and should raise an error',
-      code: getCode(wrongSchemaArguments),
-      data: hljs.highlight('json', out).value
+  blog.save(function(err, d) {
+    if (err) throw err;
+    Blog.find(function(err, data) {
+      var out = dataToString(data);
+      res.render('data', {
+        title: 'titleFF does not exist and should raise an error',
+        code: getCode(wrongSchemaArguments),
+        data: hljs.highlight('json', out).value
+      });
     });
   });
 });
@@ -101,6 +129,12 @@ app.get('/any', function (req, res) {
         data: hljs.highlight('json', out).value
       });
     });
+  });
+});
+
+app.get('/clear', function (req, res) {
+  clearData(function() {
+    res.redirect('/');
   });
 });
 
