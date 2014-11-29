@@ -1,6 +1,10 @@
 # Testing different MongoDB wrappers.
 
 ## Mongoose
+Run example app as:
+
+    $ node app-mongoose
+
 [Mongoose](http://mongoosejs.com/) seems to be most popular mongodb wrapper.
 Although there are few things which I don't like (at least from the first sight).
 

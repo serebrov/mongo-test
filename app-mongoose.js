@@ -36,6 +36,10 @@ var dataToString = function(data) {
   }, '');
 }
 
+var getCode = function(args) {
+  return hljs.highlight('javascript', args.callee.toString()).value;
+}
+
 app.use(function(req, res, next) {
   if (mongoose.connection.readyState > 0) {
     return next();
@@ -59,14 +63,16 @@ app.get('/', function (req, res) {
     var out = dataToString(data);
     res.render('data', {
       title: 'Creates a new model on each call',
+      code: getCode(arguments),
       data: hljs.highlight('json', out).value});
   });
 });
 
+var wrongSchemaArguments = null;
 app.get('/wrongSchema', function (req, res) {
+  wrongSchemaArguments = arguments;
   var blog = new Blog;
-  blog.titleZ = 'test'; // will not raise an error, mongoose doesn't
-                        // such changes
+  blog.titleZ = 'test'; // will not raise an error, mongoose doesn't see such changes
   blog.bodyZ = 'test';
   blog.set('titleFF', 'test'); // should raise an error
   blog.save();
@@ -75,12 +81,14 @@ app.get('/wrongSchema', function (req, res) {
     var out = dataToString(data);
     res.render('data', {
       title: 'titleFF does not exist and should raise an error',
+      code: getCode(wrongSchemaArguments),
       data: hljs.highlight('json', out).value
     });
   });
 });
 
 app.get('/any', function (req, res) {
+  var args = arguments;
   var any = new Any;
   any.any = {titleZ: 'test', bodyZ: 'test'};
   any.markModified('any');
@@ -89,6 +97,7 @@ app.get('/any', function (req, res) {
       var out = dataToString(data);
       res.render('data', {
         title: 'Any model, "any" field can be anything',
+        code: getCode(args),
         data: hljs.highlight('json', out).value
       });
     });
@@ -101,7 +110,8 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     var out = JSON.stringify(err.stack);
     res.render('data', {
-      title: err.message, 
+      title: err.message,
+      code: getCode(wrongSchemaArguments?wrongSchemaArguments:arguments),
       data: "<pre>"+err.stack+"</pre>"
     });
 });
