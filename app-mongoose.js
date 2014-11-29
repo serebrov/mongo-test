@@ -10,9 +10,17 @@ app.set('view engine', 'ejs');
 app.engine('ejs', require('ejs').renderFile);
 app.use(express.static(__dirname + '/public'));
 
+var userSchema = new Schema({
+  name:  String,
+  email: String
+}, {
+  strict: 'throw'
+});
+var User = mongoose.model('User', userSchema);
+
 var blogSchema = new Schema({
   title:  String,
-  author: String,
+  author: { type: Schema.Types.ObjectId, ref: 'User' },
   body:   String,
   comments: [{ body: String, date: Date }],
   date: { type: Date, default: Date.now },
@@ -48,9 +56,9 @@ var clearData = function(next) {
       next();
     });
   });
-
 };
 
+var theUser = null;
 //Connect to mongo
 app.use(function(req, res, next) {
   if (mongoose.connection.readyState > 0) {
@@ -61,7 +69,20 @@ app.use(function(req, res, next) {
     next(err);
   });
   mongoose.connection.on('open', function() {
-    next();
+    User.findOne(function(err, usr) {
+      if (err) throw err;
+      if (!usr) {
+        var newUsr = new User({name: 'Tester', email: 'tester@example.com'});
+        newUsr.save(function(err, newUsr) {
+          if (err) throw err;
+          theUser = newUsr;
+          next();
+        });
+      } else {
+        theUser = usr;
+        next();
+      }
+    });
   });
 });
 
@@ -83,6 +104,7 @@ app.get('/', function (req, res) {
   var blog = new Blog;
   blog.title = 'test';
   blog.body = 'test';
+  blog.author = theUser._id;
   blog.save(function(err, d) {
     if (err) throw err;
     Blog.find(function(err, data) {
@@ -92,6 +114,16 @@ app.get('/', function (req, res) {
         code: getCode(arguments),
         data: hljs.highlight('json', out).value});
     });
+  });
+});
+
+app.get('/refs', function (req, res) {
+  Blog.find().populate('author').exec(function(err, data) {
+    var out = dataToString(data);
+    res.render('data', {
+      title: 'Blog with author populated from User',
+      code: getCode(arguments),
+      data: hljs.highlight('json', out).value});
   });
 });
 
