@@ -3,6 +3,7 @@ var Q = require('q')
 var _ = require('lodash')
 
 module.exports = {
+  mongo: mongo,
   getQDb: getQDb,
   Qdb: QDb,
   QCol: QCol
@@ -29,6 +30,21 @@ function QDb(db) {
 function QCol(col) {
   return {
     insert: Q.nbind(col.insert, col),
-    count: Q.nbind(col.count, col)
+    remove: Q.nbind(col.remove, col),
+    count: Q.nbind(col.count, col),
+    findOne: Q.nbind(col.findOne, col),
+    find: function() {
+      var args = Array.prototype.slice.apply(arguments);
+      return new QCursor(col.find.apply(col, args));
+    }
+  };
+}
+
+/**
+ * Simple wrapper for mongodb Cursor() object to work with promises.
+ */
+function QCursor(cursor) {
+  return {
+    toArray: Q.nbind(cursor.toArray, cursor)
   };
 }
