@@ -6,13 +6,17 @@ Run example app as:
     $ node app-mongoose
 
 [Mongoose](http://mongoosejs.com/) seems to be most popular mongodb wrapper.
-Although there are few things which I don't like (at least from the first sight).
+Features are great:
+- Ability to specify [Schema](http://mongoosejs.com/docs/guide.html) to ensure data structure validity
+- [Validators](http://mongoosejs.com/docs/validation.html) to verify data itself
+- [Populate](http://mongoosejs.com/docs/validation.html) method to fetch related data
 
-Strict schema without strict checks.
+Although there are few things which I don't like.
+
 One of the most noticable mongoose features is an ability to specify Schema for
 data.
-It looks a bit strange - is it adding a schema to the schema-less MongoDb?
-But actually this can be very useful in most cases - we can ensure the data
+It can look a bit strange - why to add a schema to the schema-less MongoDb?
+But actually this can be very useful. In most cases we have some structure for the data and with mongoose we can ensure the data
 we save is not some random garbage.
 OK, let's try it:
 
@@ -53,6 +57,6 @@ Why it can't just go over object fields to find these changes?
 Another (similar in terms of usability) issue is with [instance methods](http://mongoosejs.com/docs/guide.html): "Overwriting a default mongoose document method may lead to unpredictible results".
 
 So while Mongoose's aim seems to provide a more safe and reliable way to work with
-MonogoDb it actually introduces several ways to silently break the code.
+MonogoDb it also introduces several ways to silently break the code.
 In my opinion such things should not be just described in documentation and treated
 as normal situation. The library should handle them and raise explicit errors.

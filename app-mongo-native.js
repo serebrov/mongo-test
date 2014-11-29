@@ -1,149 +1,112 @@
 var as = require('./app-skeleton');
+var hljs = require('highlight.js');
 
 var mongo = require('mongodb')
-var Schema = mongoose.Schema;
 
-var userSchema = new Schema({
-  name:  String,
-  email: String
-}, {
-  strict: 'throw'
-});
-var User = mongoose.model('User', userSchema);
-
-var blogSchema = new Schema({
-  title:  String,
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
-  body:   String,
-  comments: [{ body: String, date: Date }],
-  date: { type: Date, default: Date.now },
-  hidden: Boolean,
-  meta: {
-    votes: Number,
-    favs:  Number
-  }
-}, {
-  strict: 'throw'
-});
-var Blog = mongoose.model('Blog', blogSchema);
-
-var anySchema = new Schema({ any: {} });
-//var anySchema = new Schema({ any: Schema.Types.Mixed });
-var Any = mongoose.model('Any', anySchema);
+var db = null;
+var Blog = null;
+var User = null;
+var theUser = null;
 
 var clearData = function(next) {
   Blog.remove(function(err, data) {
     if (err) throw err;
-    Any.remove(function(err, data) {
-      if (err) throw err;
-      next();
-    });
+    next();
   });
 };
 
-var theUser = null;
 //Connect to mongo
 as.app.use(function(req, res, next) {
-  if (mongoose.connection.readyState > 0) {
+  if (db) {
     return next();
   }
-  mongoose.connect('mongodb://localhost/mongotest');
-  mongoose.connection.on('error', function(err) {
-    next(err);
-  });
-  mongoose.connection.on('open', function() {
-    User.findOne(function(err, usr) {
-      if (err) throw err;
-      if (!usr) {
-        var newUsr = new User({name: 'Tester', email: 'tester@example.com'});
-        newUsr.save(function(err, newUsr) {
-          if (err) throw err;
-          theUser = newUsr;
-          next();
+  var db = mongo.Db('mongo-test-native', new mongo.Server('localhost',27017), {w: 1});
+  db.open(function(err, db) {
+    if (err) return next(err);
+    db.collection('Blog', function(err, collection) {
+      if (err) return next(err);
+      Blog = collection;
+      db.collection('User', function(err, collection) {
+        if (err) return next(err);
+        User = collection;
+        User.findOne(function(err, usr) {
+          if (err) return next(err);
+          if (!usr) {
+            var newUsr = {name: 'Tester', email: 'tester@example.com'};
+            User.insert(newUsr,function(err, newUsr) {
+              if (err) return next(err);
+              theUser = newUsr;
+              next();
+            });
+          } else {
+            theUser = usr;
+            next();
+          }
         });
-      } else {
-        theUser = usr;
-        next();
-      }
+      });
     });
-  });
-});
-
-//Create test data
-as.app.use(function(req, res, next) {
-  if (mongoose.connection.readyState > 0) {
-    return next();
-  }
-  mongoose.connect('mongodb://localhost/mongotest');
-  mongoose.connection.on('error', function(err) {
-    next(err);
-  });
-  mongoose.connection.on('open', function() {
-    next();
   });
 });
 
 as.app.get('/', function (req, res) {
-  var blog = new Blog;
+  var blog = {};
   blog.title = 'test';
   blog.body = 'test';
   blog.author = theUser._id;
-  blog.save(function(err, d) {
+  Blog.insert(blog, function(err, d) {
     if (err) throw err;
-    Blog.find(function(err, data) {
+    Blog.find().toArray(function(err, data) {
       var out = as.dataToString(data);
       res.render('data', {
         title: 'Creates a new model on each call',
         code: as.getCode(arguments),
-        data: as.hljs.highlight('json', out).value});
+        data: hljs.highlight('json', out).value});
     });
   });
 });
 
 as.app.get('/refs', function (req, res) {
-  Blog.find().populate('author').exec(function(err, data) {
-    var out = as.dataToString(data);
-    res.render('data', {
-      title: 'Blog with author populated from User',
-      code: as.getCode(arguments),
-      data: as.hljs.highlight('json', out).value});
+  Blog.find().toArray(function(err, data) {
+    //async calls loop
+    var idx = 0, count = data.length;
+    var resolveAuthor = function(next) {
+      var post = data[idx];
+      User.findOne({_id:post['author']}, function(err, author) {
+        if (err) next(err);
+        post['author'] = author;
+        idx++;
+        if (idx < count) {
+          //resolve next
+          resolveAuthor(next);
+        } else {
+          //return
+          next(null, data);
+        }
+      });
+    };
+    resolveAuthor(function(err, data) {
+      var out = as.dataToString(data);
+      res.render('data', {
+        title: 'Blog with author populated from User',
+        code: as.getCode(arguments),
+        data: hljs.highlight('json', out).value});
+    });
   });
 });
 
-var wrongSchemaArguments = null;
 as.app.get('/wrongSchema', function (req, res) {
-  wrongSchemaArguments = arguments;
-  var blog = new Blog;
-  blog.titleZ = 'test'; // will not raise an error, mongoose doesn't see such changes
-  blog.bodyZ = 'test';
-  blog.set('titleFF', 'test'); // should raise an error
-  blog.save(function(err, d) {
-    if (err) throw err;
-    Blog.find(function(err, data) {
-      var out = as.dataToString(data);
-      res.render('data', {
-        title: 'titleFF does not exist and should raise an error',
-        code: as.getCode(wrongSchemaArguments),
-        data: as.hljs.highlight('json', out).value
-      });
-    });
+  res.render('data', {
+    title: 'No wrong schema test here',
+    code: as.getCode(arguments),
+    data: hljs.highlight('json', '').value
   });
 });
 
 as.app.get('/any', function (req, res) {
-  var args = arguments;
-  var any = new Any;
-  any.any = {titleZ: 'test', bodyZ: 'test'};
-  any.markModified('any');
-  any.save(function(err, doc, numberAffected) {
-    Any.find(function(err, data) {
-      var out = as.dataToString(data);
-      res.render('data', {
-        title: 'Any model, "any" field can be anything',
-        code: as.getCode(args),
-        data: as.hljs.highlight('json', out).value
-      });
-    });
+  res.render('data', {
+    title: 'No any schema test here',
+    code: as.getCode(arguments),
+    data: hljs.highlight('json', '').value
   });
 });
 
@@ -160,10 +123,9 @@ as.app.use(function(err, req, res, next) {
     var out = JSON.stringify(err.stack);
     res.render('data', {
       title: err.message,
-      code: as.getCode(wrongSchemaArguments?wrongSchemaArguments:arguments),
+      code: as.getCode(arguments),
       data: "<pre>"+err.stack+"</pre>"
     });
 });
 
 as.run();
-
