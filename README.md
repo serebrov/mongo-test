@@ -6,8 +6,8 @@ Run example app as:
 
 And open http://localhost:3000/.
 
-The app will display a page with driver selection at the top (native, native with q, mongoose, etc).
-And few test pages below. Each page shows test function code and results.
+The app will display a page with driver selection at the top (native, native with q, mongoose, etc) and few test pages below.
+Each page shows test function code and results.
 
 ## Mongodb native driver
 
