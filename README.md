@@ -1,5 +1,9 @@
 # Testing different MongoDB wrappers.
 
+Install dependencies:
+
+    $ npm install -d
+
 Run example app as:
 
     $ node app
@@ -7,7 +11,9 @@ Run example app as:
 And open http://localhost:3000/.
 
 The app will display a page with driver selection at the top (native, native with q, mongoose, etc) and few test pages below.
-Each page shows test function code and results.
+Each page shows test function code and results, like this:
+
+![page example](image/page-ex.png "Mongo native driver - populate references")
 
 ## Mongodb native driver
 
