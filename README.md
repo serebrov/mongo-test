@@ -1,16 +1,19 @@
 # Testing different MongoDB wrappers.
 
-## Mongodb native driver
 Run example app as:
 
-    $ node app-mongo-native
+    $ node app
+
+And open http://localhost:3000/.
+
+The app will display a page with driver selection at the top (native, native with q, mongoose, etc).
+And few test pages below. Each page shows test function code and results.
+
+## Mongodb native driver
 
 This is an official [mongodb native node.js driver](http://mongodb.github.io/node-mongodb-native/).
 
 ## Mongodb native driver with simple Q wrapper for db and collections
-Run example app as:
-
-    $ node app-mongo-native-q
 
 Original native driver code looks like this:
 
@@ -76,9 +79,6 @@ db.open().then(function(qdb) {
 ```
 
 ## Mongoose
-Run example app as:
-
-    $ node app-mongoose
 
 [Mongoose](http://mongoosejs.com/) seems to be most popular mongodb wrapper.
 Features are great:

@@ -8,6 +8,7 @@ var db = null;
 var Blog = null;
 var User = null;
 var theUser = null;
+var path = 'mongo-native-q';
 
 var clearData = function(next) {
   Blog.remove().then(function(err, data) {
@@ -45,8 +46,8 @@ as.app.use(function(req, res, next) {
   });
 });
 
-as.app.get('/', function (req, res, next) {
-  var code = as.getCode(arguments);
+as.app.get('/'+path+'/', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   var blog = {};
   blog.title = 'test';
   blog.body = 'test';
@@ -56,8 +57,10 @@ as.app.get('/', function (req, res, next) {
   }).then(function(data) {
     var out = as.dataToString(data);
     res.render('data', {
-      title: 'Creates a new model on each call',
-      code: code,
+      path: path,
+      page: 'home',
+      title: 'Mongo native with Q - Creates a new model on each call',
+      code:as.app.code,
       data: hljs.highlight('json', out).value
     });
   }).fail(function(err) {
@@ -65,8 +68,8 @@ as.app.get('/', function (req, res, next) {
   });
 });
 
-as.app.get('/refs', function (req, res, next) {
-  var code = as.getCode(arguments);
+as.app.get('/'+path+'/refs', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   Blog.find().toArray().then(function(data) {
     var fullData = [Q(data)];
     //resolve users
@@ -84,8 +87,10 @@ as.app.get('/refs', function (req, res, next) {
     });
     var out = as.dataToString(data);
     res.render('data', {
-      title: 'Blog with author populated from User',
-      code: code,
+      path: path,
+      page: 'refs',
+      title: 'Mongo native with Q - Blog with author populated from User',
+      code:as.app.code,
       data: hljs.highlight('json', out).value
     });
   }).fail(function(err) {
@@ -93,38 +98,28 @@ as.app.get('/refs', function (req, res, next) {
   });
 });
 
-as.app.get('/wrongSchema', function (req, res, next) {
+as.app.get('/'+path+'/wrongSchema', function (req, res, next) {
   res.render('data', {
-    title: 'No wrong schema test here',
+    path: path,
+    page: 'wrongSchema',
+    title: 'Mongo native with Q - No wrong schema test here',
     code: as.getCode(arguments),
     data: hljs.highlight('json', '').value
   });
 });
 
-as.app.get('/any', function (req, res, next) {
+as.app.get('/'+path+'/any', function (req, res, next) {
   res.render('data', {
-    title: 'No any schema test here',
+    path: path,
+    page: 'any',
+    title: 'Mongo native with Q - No any schema test here',
     code: as.getCode(arguments),
     data: hljs.highlight('json', '').value
   });
 });
 
-as.app.get('/clear', function (req, res, next) {
+as.app.get('/'+path+'/clear', function (req, res, next) {
   clearData(function() {
-    res.redirect('/');
+    res.redirect('/'+path+'/');
   });
 });
-
-// production error handler
-// no stacktraces leaked to user
-as.app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    var out = JSON.stringify(err.stack);
-    res.render('data', {
-      title: err.message,
-      code: as.getCode(arguments),
-      data: "<pre>"+err.stack+"</pre>"
-    });
-});
-
-as.run();

@@ -5,18 +5,24 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0" />
     <title>mongo-test</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/highlight.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/styles.css" media="all" />
 </head>
 <body>
-    <a href='/'>home</a>&nbsp;
-    <a href='/refs'>references population</a>&nbsp;
-    <a href='/any'>any schema test</a>&nbsp;
-    <a href='/wrongSchema'>wrong schema test</a>
-    <a href='/clear'>clear data</a>&nbsp;
+    <a href='/mongo-native' class="<%= path=='mongo-native'?'active':''%>">mongo native driver</a>&nbsp;
+    <a href='/mongo-native-q' class="<%= path=='mongo-native-q'?'active':''%>">mongo native driver with q</a>&nbsp;
+    <a href='/mongoose' class="<%= path=='mongoose'?'active':''%>">mongoose</a>&nbsp;
     <br/>
     <br/>
-    <div>
+    <a href='/<%= path %>/' class="<%= page=='home'?'active':''%>">home (<%= path %>)</a>&nbsp;
+    <a href='/<%= path %>/refs' class="<%= page=='refs'?'active':''%>">references population</a>&nbsp;
+    <a href='/<%= path %>/any' class="<%= page=='any'?'active':''%>">any schema test</a>&nbsp;
+    <a href='/<%= path %>/wrongSchema' class="<%= page=='wrongSchema'?'active':''%>">wrong schema test</a>
+    <a href='/<%= path %>/clear'">clear data</a>&nbsp;
+    <br/>
+    <br/>
+    <h1>
         <%- title %>
-    </div>
+    </h1>
     <div><code><pre><%- code %></pre></code></div>
     <div><code>
         <%- data %>

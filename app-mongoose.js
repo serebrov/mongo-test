@@ -43,6 +43,8 @@ var clearData = function(next) {
 };
 
 var theUser = null;
+var path = 'mongoose';
+
 //Connect to mongo
 as.app.use(function(req, res, next) {
   if (mongoose.connection.readyState > 0) {
@@ -84,8 +86,8 @@ as.app.use(function(req, res, next) {
   });
 });
 
-as.app.get('/', function (req, res) {
-  var code = as.getCode(arguments);
+as.app.get('/'+path+'/', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   var blog = new Blog;
   blog.title = 'test';
   blog.body = 'test';
@@ -95,27 +97,30 @@ as.app.get('/', function (req, res) {
     Blog.find(function(err, data) {
       var out = as.dataToString(data);
       res.render('data', {
-        title: 'Creates a new model on each call',
-        code: code,
+        path: path,
+        page: 'home',
+        title: 'Mongoose - Creates a new model on each call',
+        code:as.app.code,
         data: hljs.highlight('json', out).value});
     });
   });
 });
 
-as.app.get('/refs', function (req, res) {
-  var code = as.getCode(arguments);
+as.app.get('/'+path+'/refs', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   Blog.find().populate('author').exec(function(err, data) {
     var out = as.dataToString(data);
     res.render('data', {
-      title: 'Blog with author populated from User',
-      code: code,
+      path: path,
+      page: 'refs',
+      title: 'Mongoose - Blog with author populated from User',
+      code:as.app.code,
       data: hljs.highlight('json', out).value});
   });
 });
 
-var wrongSchemaArguments = null;
-as.app.get('/wrongSchema', function (req, res) {
-  wrongSchemaArguments = arguments;
+as.app.get('/'+path+'/wrongSchema', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   var blog = new Blog;
   blog.titleZ = 'test'; // will not raise an error, mongoose doesn't see such changes
   blog.bodyZ = 'test';
@@ -125,16 +130,18 @@ as.app.get('/wrongSchema', function (req, res) {
     Blog.find(function(err, data) {
       var out = as.dataToString(data);
       res.render('data', {
-        title: 'titleFF does not exist and should raise an error',
-        code: as.getCode(wrongSchemaArguments),
+        path: path,
+        page: 'wrongSchema',
+        title: 'Mongoose - titleFF does not exist and should raise an error',
+        code: as.app.code,
         data: hljs.highlight('json', out).value
       });
     });
   });
 });
 
-as.app.get('/any', function (req, res) {
-  var code = as.getCode(arguments);
+as.app.get('/'+path+'/any', function (req, res, next) {
+  as.app.code = as.getCode(arguments);
   var any = new Any;
   any.any = {titleZ: 'test', bodyZ: 'test'};
   any.markModified('any');
@@ -142,30 +149,18 @@ as.app.get('/any', function (req, res) {
     Any.find(function(err, data) {
       var out = as.dataToString(data);
       res.render('data', {
-        title: 'Any model, "any" field can be anything',
-        code: code,
+        path: path,
+        page: 'any',
+        title: 'Mongoose - Any model, "any" field can be anything',
+        code:as.app.code,
         data: hljs.highlight('json', out).value
       });
     });
   });
 });
 
-as.app.get('/clear', function (req, res) {
+as.app.get('/'+path+'/clear', function (req, res, next) {
   clearData(function() {
-    res.redirect('/');
+    res.redirect('/'+path+'/');
   });
 });
-
-// production error handler
-// no stacktraces leaked to user
-as.app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    var out = JSON.stringify(err.stack);
-    res.render('data', {
-      title: err.message,
-      code: as.getCode(wrongSchemaArguments?wrongSchemaArguments:arguments),
-      data: "<pre>"+err.stack+"</pre>"
-    });
-});
-
-as.run();
