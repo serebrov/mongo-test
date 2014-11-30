@@ -18,10 +18,7 @@ Each page shows test function code and results, like this:
 ## Mongodb native driver
 
 This is an official [mongodb native node.js driver](http://mongodb.github.io/node-mongodb-native/).
-
-## Mongodb native driver with simple Q wrapper for db and collections
-
-Original native driver code looks like this:
+API is based on callbacks:
 
 ```javascript
 var Blog, User, theUser;
@@ -53,9 +50,13 @@ db.open(function(err, db) {
 });
 ```
 
+So it is a good idea to use it along with [async](https://github.com/caolan/async) or [Q](https://github.com/kriskowal/q).
+
+## Mongodb native driver with simple Q wrapper for db and collections
+
 Q wrappers are tiny classes (see mongodb-q.js) which wrap original mongo driver
 callback-style methods into Q-style methods.
-Code with q wrappers:
+Code with q wrappers looks like this:
 
 ```javascript
 var Blog, User, theUser;
@@ -87,7 +88,7 @@ db.open().then(function(qdb) {
 ## Mongoose
 
 [Mongoose](http://mongoosejs.com/) seems to be most popular mongodb wrapper.
-Features are great:
+It provides some great features:
 - Ability to specify [Schema](http://mongoosejs.com/docs/guide.html) to ensure data structure validity
 - [Validators](http://mongoosejs.com/docs/validation.html) to verify data itself
 - [Populate](http://mongoosejs.com/docs/validation.html) method to fetch related data
@@ -145,3 +146,4 @@ So while Mongoose's aim seems to provide a more safe and reliable way to work wi
 MonogoDb it also introduces several ways to silently break the code.
 In my opinion such things should not be just described in documentation and treated
 as normal situation. The library should handle them and raise explicit errors.
+Anyway mongoose features look very good - just use it carefully.
