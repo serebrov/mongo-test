@@ -49,6 +49,7 @@ as.app.use(function(req, res, next) {
 });
 
 as.app.get('/', function (req, res) {
+  var code = as.getCode(arguments);
   var blog = {};
   blog.title = 'test';
   blog.body = 'test';
@@ -59,13 +60,14 @@ as.app.get('/', function (req, res) {
       var out = as.dataToString(data);
       res.render('data', {
         title: 'Creates a new model on each call',
-        code: as.getCode(arguments),
+        code: code,
         data: hljs.highlight('json', out).value});
     });
   });
 });
 
 as.app.get('/refs', function (req, res) {
+  var code = as.getCode(arguments);
   Blog.find().toArray(function(err, data) {
     //async calls loop
     var idx = 0, count = data.length;
@@ -88,7 +90,7 @@ as.app.get('/refs', function (req, res) {
       var out = as.dataToString(data);
       res.render('data', {
         title: 'Blog with author populated from User',
-        code: as.getCode(arguments),
+        code: code,
         data: hljs.highlight('json', out).value});
     });
   });

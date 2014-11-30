@@ -46,6 +46,7 @@ as.app.use(function(req, res, next) {
 });
 
 as.app.get('/', function (req, res, next) {
+  var code = as.getCode(arguments);
   var blog = {};
   blog.title = 'test';
   blog.body = 'test';
@@ -56,7 +57,7 @@ as.app.get('/', function (req, res, next) {
     var out = as.dataToString(data);
     res.render('data', {
       title: 'Creates a new model on each call',
-      code: as.getCode(arguments),
+      code: code,
       data: hljs.highlight('json', out).value
     });
   }).fail(function(err) {
@@ -65,6 +66,7 @@ as.app.get('/', function (req, res, next) {
 });
 
 as.app.get('/refs', function (req, res, next) {
+  var code = as.getCode(arguments);
   Blog.find().toArray().then(function(data) {
     var fullData = [Q(data)];
     //resolve users
@@ -83,7 +85,7 @@ as.app.get('/refs', function (req, res, next) {
     var out = as.dataToString(data);
     res.render('data', {
       title: 'Blog with author populated from User',
-      code: as.getCode(arguments),
+      code: code,
       data: hljs.highlight('json', out).value
     });
   }).fail(function(err) {
