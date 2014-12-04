@@ -88,18 +88,17 @@ db.open().then(function(qdb) {
 ## Mongoose
 
 [Mongoose](http://mongoosejs.com/) seems to be most popular mongodb wrapper.
-It provides some great features:
+And it has much more features that other libraries, some of them are:
 - Ability to specify [Schema](http://mongoosejs.com/docs/guide.html) to ensure data structure validity
 - [Validators](http://mongoosejs.com/docs/validation.html) to verify data itself
 - [Populate](http://mongoosejs.com/docs/validation.html) method to fetch related data
+- [Promises](http://mongoosejs.com/docs/api.html#promise_Promise) - exec() method returns a promise (see [mpromise](https://github.com/aheckmann/mpromise))
 
-Although there are few things which I don't like.
+Although there are few things which I didn't like.
 
-One of the most noticable mongoose features is an ability to specify Schema for
-data.
-It can look a bit strange - why to add a schema to the schema-less MongoDb?
-But actually this can be very useful. In most cases we have some structure for the data and with mongoose we can ensure the data
-we save is not some random garbage.
+One of the most noticeable mongoose features is an ability to specify Schema for
+data. 
+This is very useful and in most cases we have some structure for the data and with mongoose we can ensure the data we save is not a some random garbage.
 OK, let's try it:
 
 ```javascript
@@ -157,4 +156,18 @@ Here the callback is passed to the last method (instead of callback for each met
     db.collection('Blog').find().toArray(function(err, data) {
       ....
     }
+```
+
+## Monk
+
+[Monk](https://github.com/aheckmann/mpromise) is built on top of [mongoskin](https://github.com/kissjs/node-mongoskin).
+It has a convenient API and supports promises (based on [mpromise](https://github.com/aheckmann/mpromise)).
+
+```javascript
+  var db = require('monk')('localhost/mongo-test-monk');
+  var Blog = db.get('blog');
+
+  Blog.find().success(function(data) {
+    //do something with data
+  });
 ```
