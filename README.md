@@ -147,3 +147,14 @@ MonogoDb it also introduces several ways to silently break the code.
 In my opinion such things should not be just described in documentation and treated
 as normal situation. The library should handle them and raise explicit errors.
 Anyway mongoose features look very good - just use it carefully.
+
+## Mongoskin
+
+[Mongoskin](https://github.com/kissjs/node-mongoskin) is a wrapper around the native driver which allows to chain method calls.
+Here the callback is passed to the last method (instead of callback for each method in the native driver):
+
+```javascript
+    db.collection('Blog').find().toArray(function(err, data) {
+      ....
+    }
+```

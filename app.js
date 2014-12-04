@@ -2,6 +2,7 @@ var as = require('./app-skeleton');
 var mongoNativeApp = require('./app-mongo-native');
 var mongoNativeQApp = require('./app-mongo-native-q');
 var mongooseApp = require('./app-mongoose');
+var mongooseApp = require('./app-mongoskin');
 
 as.app.get('/', function (req, res, next) {
   res.redirect('/mongo-native/');
