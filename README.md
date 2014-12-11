@@ -97,7 +97,7 @@ And it has much more features that other libraries, some of them are:
 Although there are few things which I didn't like.
 
 One of the most noticeable mongoose features is an ability to specify Schema for
-data. 
+data.
 This is very useful and in most cases we have some structure for the data and with mongoose we can ensure the data we save is not a some random garbage.
 OK, let's try it:
 
@@ -171,3 +171,26 @@ It has a convenient API and supports promises (based on [mpromise](https://githu
     //do something with data
   });
 ```
+
+## Other libraries
+
+[Mongolia](https://github.com/masylum/mongolia)
+Models, validation, namespaces (filter returned fields),
+embedded documents
+
+[Mongosmash](https://github.com/bengl/mongosmash)
+Marked as not finished and requires node with harmony.
+According to their benchmark is much faster than mongoose.
+
+[Mongojs](https://github.com/mafintosh/mongojs)
+A node.js module for mongodb, that emulates the official mongodb API as much as possible. It wraps mongodb-native
+
+[Promised mongo](https://github.com/gordonmleigh/promised-mongo)
+A slight rewrite of mongojs to support promises. To aid with migration, this API is fully backwardly-compatible with mongojs, but all functions that accept callbacks now return promises too. Promises are Promises/A+ compatible, so you are free to use any compatible promise library. The promise library used by this project is Q.
+
+[JugglingDb](https://github.com/1602/jugglingdb)
+Multi-database ORM: redis, mongodb, mysql, sqlite, postgres, neo4j, memory... Many databases, common API.
+http://jugglingdb.co
+
+[Mongo migrate](https://github.com/afloyd/mongo-migrate)
+Migration framework. Built with a starting framework from: https://github.com/visionmedia/node-migrate
